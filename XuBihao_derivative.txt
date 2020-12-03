@@ -1,0 +1,51 @@
+#徐碧浩201700501008
+#导数
+import numpy as np
+import matplotlib.pyplot as plt
+
+up_region = 10	    	#上确界
+down_region = 0.01  	#下确界
+div_num = 10000	        #分度数
+radium = 10	    	#光滑半径数
+dx = (up_region - down_region)/div_num  	#微元
+h = dx * (radium+0.5)   	            	#光滑半径
+rho =  np.ones(div_num, dtype=float)            #密度
+m = rho * dx    	    	        	#质量微元
+x = np.linspace(down_region, up_region, div_num)#微元数组
+
+fx = np.sin( x )   	            #函数
+#fx = x**2 -x +1
+#fx = np.log(x)
+
+f_out = np.zeros(div_num)   	    #输出数组
+
+for i in range(0, div_num):
+    down_j = 0	    	    	    
+    up_j = div_num
+    if (i - radium)>0:
+        down_j = i - radium
+    if (i + radium)<div_num:
+        up_j = i + radium
+    for j in range(down_j, up_j):
+        ad = 5/(4 * h)
+        r = x[i] - x[j]
+        R = np.abs(r)/h
+        k = np.sign(r)
+        if i == j:
+            k = 0
+        if R > 1:
+            ad = 0
+        w = ad * (1 + 3 * R)*(1 - R)**3
+        w_grad_1 = ad * ( 3*(1 - R)**3 - 3*(1 + 3 * R)*(1 - R)**2)* k /h
+        f_out[i] = f_out[i] + m[j] /rho[j] * fx[j] * w_grad_1
+
+f_out[0:10]=0	        	#删去边界
+
+f_out[-10::]=0	                #删去边界
+
+
+fig = plt.figure()
+plt.plot(x, fx, '-')
+plt.plot(x, f_out, '--')
+plt.grid()
+plt.show()
